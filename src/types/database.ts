@@ -15,3 +15,15 @@ export type AddDatabaseInput = {
 	name: string;
 	postgresUrl: string;
 };
+
+export type TableReference = {
+	schema: string;
+	name: string;
+	qualifiedName: string;
+};
+
+export type TableRowsPreview = {
+	columns: string[];
+	rows: Array<Record<string, unknown>>;
+	limit: number;
+};
