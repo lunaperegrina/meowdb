@@ -1,4 +1,4 @@
-import { CliError } from '../../errors';
+import { CliError } from '@/errors';
 
 const identifierPattern = /^[a-zA-Z_]\w*$/;
 

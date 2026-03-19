@@ -1,7 +1,7 @@
-import { assertMaximumArgumentCount } from './shared/args';
-import { getActiveConnection } from './shared/active-connection';
-import { assertIdentifier } from './shared/validation';
-import { type CommandSuccess, type Dependencies } from './types';
+import { assertMaximumArgumentCount } from '@/execute-command/shared/args';
+import { getActiveConnection } from '@/execute-command/shared/active-connection';
+import { assertIdentifier } from '@/execute-command/shared/validation';
+import { type CommandSuccess, type Dependencies } from '@/execute-command/types';
 
 export async function handleTables(
 	args: string[],

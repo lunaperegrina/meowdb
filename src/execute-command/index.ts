@@ -4,16 +4,16 @@ import {
 	loadOrCreateConfig,
 	readConfig,
 	writeConfig,
-} from '../config-store';
-import { CliError } from '../errors';
+} from '@/config-store';
+import { CliError } from '@/errors';
 import {
 	getRows as getRowsFromPostgres,
 	listTables as listTablesFromPostgres,
-} from '../postgres';
-import { handleDb } from './db';
-import { handleRows } from './rows';
-import { handleTables } from './tables';
-import { type CommandSuccess, type Dependencies, type Flags } from './types';
+} from '@/postgres';
+import { handleDb } from '@/execute-command/db';
+import { handleRows } from '@/execute-command/rows';
+import { handleTables } from '@/execute-command/tables';
+import { type CommandSuccess, type Dependencies, type Flags } from '@/execute-command/types';
 
 const defaultDependencies: Dependencies = {
 	getNow: () => new Date().toISOString(),
@@ -62,4 +62,4 @@ export async function executeCommand(
 	}
 }
 
-export type { CommandSuccess, Dependencies, Flags } from './types';
+export type { CommandSuccess, Dependencies, Flags } from '@/execute-command/types';

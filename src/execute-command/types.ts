@@ -1,4 +1,4 @@
-import { type CliConfig } from '../config-store';
+import { type CliConfig } from '@/config-store';
 
 export type Flags = {
 	json: boolean;

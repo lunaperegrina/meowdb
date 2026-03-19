@@ -1,7 +1,7 @@
-import { type CommandSuccess, type Dependencies } from '../types';
-import { assertArgumentCount, getRequiredArg } from '../shared/args';
-import { normalizeDatabaseUrl } from '../shared/validation';
-import { CliError } from '../../errors';
+import { type CommandSuccess, type Dependencies } from '@/execute-command/types';
+import { assertArgumentCount, getRequiredArg } from '@/execute-command/shared/args';
+import { normalizeDatabaseUrl } from '@/execute-command/shared/validation';
+import { CliError } from '@/errors';
 
 export async function handleDbAdd(
 	args: string[],

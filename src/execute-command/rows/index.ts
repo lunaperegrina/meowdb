@@ -1,8 +1,8 @@
-import { formatRowsForHuman, formatRowsForQuiet } from './format';
-import { assertArgumentCount, getRequiredArg } from '../shared/args';
-import { getActiveConnection } from '../shared/active-connection';
-import { assertIdentifier, assertPositiveLimit } from '../shared/validation';
-import { type CommandSuccess, type Dependencies, type Flags } from '../types';
+import { formatRowsForHuman, formatRowsForQuiet } from '@/execute-command/rows/format';
+import { assertArgumentCount, getRequiredArg } from '@/execute-command/shared/args';
+import { getActiveConnection } from '@/execute-command/shared/active-connection';
+import { assertIdentifier, assertPositiveLimit } from '@/execute-command/shared/validation';
+import { type CommandSuccess, type Dependencies, type Flags } from '@/execute-command/types';
 
 const rowsLimitDefault = 20;
 

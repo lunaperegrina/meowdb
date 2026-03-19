@@ -1,5 +1,5 @@
-import { type CliConfig, type ConnectionConfig } from '../../config-store';
-import { CliError } from '../../errors';
+import { type CliConfig, type ConnectionConfig } from '@/config-store';
+import { CliError } from '@/errors';
 
 export function getActiveConnection(config: CliConfig): {
 	name: string;

@@ -1,4 +1,4 @@
-import { CliError } from '../../errors';
+import { CliError } from '@/errors';
 
 export function assertArgumentCount(
 	args: string[],

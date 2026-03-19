@@ -1,10 +1,10 @@
-import { CliError } from '../../errors';
-import { type CommandSuccess, type Dependencies } from '../types';
-import { handleDbAdd } from './add';
-import { handleDbInfo } from './info';
-import { handleDbList } from './list';
-import { handleDbRemove } from './remove';
-import { handleDbUse } from './use';
+import { CliError } from '@/errors';
+import { type CommandSuccess, type Dependencies } from '@/execute-command/types';
+import { handleDbAdd } from '@/execute-command/db/add';
+import { handleDbInfo } from '@/execute-command/db/info';
+import { handleDbList } from '@/execute-command/db/list';
+import { handleDbRemove } from '@/execute-command/db/remove';
+import { handleDbUse } from '@/execute-command/db/use';
 
 export async function handleDb(
 	args: string[],

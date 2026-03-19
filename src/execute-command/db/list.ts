@@ -1,7 +1,7 @@
-import { defaultConfig } from '../../config-store';
-import { CliError } from '../../errors';
-import { assertArgumentCount } from '../shared/args';
-import { type CommandSuccess, type Dependencies } from '../types';
+import { defaultConfig } from '@/config-store';
+import { CliError } from '@/errors';
+import { assertArgumentCount } from '@/execute-command/shared/args';
+import { type CommandSuccess, type Dependencies } from '@/execute-command/types';
 
 export async function handleDbList(
 	args: string[],

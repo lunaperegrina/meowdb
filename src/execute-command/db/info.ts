@@ -1,6 +1,6 @@
-import { assertArgumentCount } from '../shared/args';
-import { getActiveConnection } from '../shared/active-connection';
-import { type CommandSuccess, type Dependencies } from '../types';
+import { assertArgumentCount } from '@/execute-command/shared/args';
+import { getActiveConnection } from '@/execute-command/shared/active-connection';
+import { type CommandSuccess, type Dependencies } from '@/execute-command/types';
 
 export async function handleDbInfo(
 	args: string[],

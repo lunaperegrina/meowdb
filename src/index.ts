@@ -3,15 +3,15 @@ import process from 'node:process';
 import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
-import App from './app';
-import { executeCommand } from './execute-command/index';
-import { toCliError } from './errors';
+import App from '@/app';
+import { executeCommand } from '@/execute-command/index';
+import { toCliError } from '@/errors';
 import {
 	formatErrorJsonPayload,
 	formatHumanErrorLines,
 	formatHumanSuccessLines,
 	formatSuccessJsonPayload,
-} from './output';
+} from '@/output';
 
 const cli = meow(
 	`

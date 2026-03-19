@@ -1,6 +1,6 @@
-import { CliError } from '../../errors';
-import { assertArgumentCount, getRequiredArg } from '../shared/args';
-import { type CommandSuccess, type Dependencies } from '../types';
+import { CliError } from '@/errors';
+import { assertArgumentCount, getRequiredArg } from '@/execute-command/shared/args';
+import { type CommandSuccess, type Dependencies } from '@/execute-command/types';
 
 export async function handleDbRemove(
 	args: string[],

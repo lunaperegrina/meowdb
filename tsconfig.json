@@ -3,6 +3,10 @@
   "include": ["src/**/*"],
   "compilerOptions": {
     "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "module": "es2022",
     "moduleResolution": "bundler",
     "target": "ES2022",
