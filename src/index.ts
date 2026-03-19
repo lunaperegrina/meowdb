@@ -4,8 +4,8 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import App from './app';
+import { executeCommand } from './execute-command/index';
 import { toCliError } from './errors';
-import { executeCommand } from './execute-command';
 import {
 	formatErrorJsonPayload,
 	formatHumanErrorLines,
