@@ -1,8 +1,10 @@
 {
-	"name": "meowdb",
-	"version": "0.0.0",
+	"name": "@lunaperegrina/meowdb",
+	"version": "0.0.1",
 	"license": "MIT",
-	"bin": "dist/bundle.js",
+	"bin": {
+		"meowdb": "dist/bundle.js"
+	},
 	"type": "module",
 	"engines": {
 		"node": ">=16"

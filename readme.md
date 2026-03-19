@@ -1,4 +1,4 @@
-# meowdb CLI
+# @lunaperegrina/meowdb CLI
 
 ```text
  /\_/\\
@@ -19,7 +19,7 @@ A tiny, cute terminal app to explore PostgreSQL databases quickly. (´｡• ᵕ
 ## Install
 
 ```bash
-npm install -g meowdb
+npm install -g @lunaperegrina/meowdb
 ```
 
 ## Development
@@ -33,6 +33,8 @@ npm run dev
 ```bash
 meowdb
 ```
+
+The global package name is `@lunaperegrina/meowdb`, and the executable command is `meowdb`.
 
 ```text
 (=^-ω-^=)  happy querying!
