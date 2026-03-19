@@ -23,6 +23,10 @@ const ROW_NUMBER_WIDTH = 4;
 const CELL_MIN_WIDTH = 8;
 const CELL_MAX_WIDTH = 24;
 const CELL_SEPARATOR = ' | ';
+const MAIN_BACKGROUND = '#0B1020';
+const SURFACE_BACKGROUND = '#131A2A';
+const PRIMARY_TEXT = '#F3F6FC';
+const SECONDARY_TEXT = '#8C97B2';
 
 const getTerminalSize = (stdout: NodeJS.WriteStream) => ({
 	columns: stdout.columns && stdout.columns > 0 ? stdout.columns : FALLBACK_COLUMNS,
@@ -826,18 +830,25 @@ export default function App() {
 				width={terminalSize.columns}
 				padding={1}
 				overflow="hidden"
-				backgroundColor="#000"
+				backgroundColor={MAIN_BACKGROUND}
 			>
 				{visibleMessages.length === 0 ? (
-					<Text dimColor>Digite / para abrir o slash menu.</Text>
+					<Text color={SECONDARY_TEXT}>Digite / para abrir o slash menu.</Text>
 				) : null}
 				{visibleMessages.map((message, index) => (
-					<Text key={`${index}-${message}`}>{message}</Text>
+					<Text key={`${index}-${message}`} color={PRIMARY_TEXT}>
+						{message}
+					</Text>
 				))}
 			</Box>
 
 			{mode === 'slashMenu' ? (
-				<Box width={terminalSize.columns} paddingX={1} paddingBottom={1} backgroundColor="#000">
+				<Box
+					width={terminalSize.columns}
+					paddingX={1}
+					paddingBottom={1}
+					backgroundColor={MAIN_BACKGROUND}
+				>
 					<Box
 						flexDirection="column"
 						borderStyle="round"
@@ -853,10 +864,10 @@ export default function App() {
 								const isSelected = index === slashIndex;
 								return (
 									<Box key={command.id} justifyContent="space-between">
-										<Text color={isSelected ? 'cyan' : undefined}>
+										<Text color={isSelected ? 'cyan' : PRIMARY_TEXT}>
 											{`${isSelected ? '›' : ' '} /${command.label}`}
 										</Text>
-										<Text dimColor>{command.description}</Text>
+										<Text color={SECONDARY_TEXT}>{command.description}</Text>
 									</Box>
 								);
 							})
@@ -866,7 +877,12 @@ export default function App() {
 			) : null}
 
 			{mode === 'addForm' ? (
-				<Box width={terminalSize.columns} paddingX={1} paddingBottom={1} backgroundColor="#000">
+				<Box
+					width={terminalSize.columns}
+					paddingX={1}
+					paddingBottom={1}
+					backgroundColor={MAIN_BACKGROUND}
+				>
 					<Box
 						flexDirection="column"
 						borderStyle="round"
@@ -876,17 +892,19 @@ export default function App() {
 						height={MODAL_HEIGHT}
 					>
 						<Box justifyContent="space-between">
-							<Text bold>Add database</Text>
-							<Text dimColor>esc</Text>
+							<Text bold color={PRIMARY_TEXT}>
+								Add database
+							</Text>
+							<Text color={SECONDARY_TEXT}>esc</Text>
 						</Box>
-						<Text color={formField === 'name' ? 'green' : undefined}>
+						<Text color={formField === 'name' ? 'green' : PRIMARY_TEXT}>
 							{`name: ${formField === 'name' ? '›' : ' '} ${formName.length > 0 ? formName : '...'}`}
 						</Text>
-						<Text color={formField === 'postgresUrl' ? 'green' : undefined}>
+						<Text color={formField === 'postgresUrl' ? 'green' : PRIMARY_TEXT}>
 							{`postgresURL: ${formField === 'postgresUrl' ? '›' : ' '} ${formPostgresUrl.length > 0 ? formPostgresUrl : '...'}`}
 						</Text>
-						<Text dimColor>tab alterna campo • enter salva • esc cancela</Text>
-						<Text dimColor>
+						<Text color={SECONDARY_TEXT}>tab alterna campo • enter salva • esc cancela</Text>
+						<Text color={SECONDARY_TEXT}>
 							{isSavingDatabase
 								? 'Salvando database...'
 								: 'URL aceita: postgres:// ou postgresql://'}
@@ -896,7 +914,12 @@ export default function App() {
 			) : null}
 
 			{mode === 'listModal' ? (
-				<Box width={terminalSize.columns} paddingX={1} paddingBottom={1} backgroundColor="#000">
+				<Box
+					width={terminalSize.columns}
+					paddingX={1}
+					paddingBottom={1}
+					backgroundColor={MAIN_BACKGROUND}
+				>
 					<Box
 						flexDirection="column"
 						borderStyle="round"
@@ -906,34 +929,41 @@ export default function App() {
 						height={MODAL_HEIGHT}
 					>
 						<Box justifyContent="space-between">
-							<Text bold>Databases</Text>
-							<Text dimColor>esc</Text>
+							<Text bold color={PRIMARY_TEXT}>
+								Databases
+							</Text>
+							<Text color={SECONDARY_TEXT}>esc</Text>
 						</Box>
 						{listEntries.length === 0 ? (
-							<Text dimColor>Nenhuma database cadastrada.</Text>
+							<Text color={SECONDARY_TEXT}>Nenhuma database cadastrada.</Text>
 						) : (
 							listEntries.map((database, index) => {
 								const isSelected = index === listIndex;
 								const isActive = database.id === databaseState.activeDatabaseId;
 								return (
 									<Box key={database.id} flexDirection="column">
-										<Text color={isSelected ? 'yellow' : undefined}>
+										<Text color={isSelected ? 'yellow' : PRIMARY_TEXT}>
 											{`${isSelected ? '›' : ' '} ${database.name}${isActive ? ' (active)' : ''}`}
 										</Text>
-										<Text dimColor>
+										<Text color={SECONDARY_TEXT}>
 											{`   ${truncateText(database.postgresUrl, listMaxUrlLength)}`}
 										</Text>
 									</Box>
 								);
 							})
 						)}
-						<Text dimColor>{isSettingActive && 'Ativando database...'}</Text>
+						<Text color={SECONDARY_TEXT}>{isSettingActive && 'Ativando database...'}</Text>
 					</Box>
 				</Box>
 			) : null}
 
 			{mode === 'tablesModal' ? (
-				<Box width={terminalSize.columns} paddingX={1} paddingBottom={1} backgroundColor="#000">
+				<Box
+					width={terminalSize.columns}
+					paddingX={1}
+					paddingBottom={1}
+					backgroundColor={MAIN_BACKGROUND}
+				>
 					<Box
 						flexDirection="column"
 						borderStyle="round"
@@ -943,25 +973,27 @@ export default function App() {
 						height={MODAL_HEIGHT}
 					>
 						<Box justifyContent="space-between">
-							<Text bold>Tables</Text>
-							<Text dimColor>esc</Text>
+							<Text bold color={PRIMARY_TEXT}>
+								Tables
+							</Text>
+							<Text color={SECONDARY_TEXT}>esc</Text>
 						</Box>
 						{isLoadingTables ? (
-							<Text dimColor>Carregando tabelas...</Text>
+							<Text color={SECONDARY_TEXT}>Carregando tabelas...</Text>
 						) : tables.length === 0 ? (
-							<Text dimColor>Nenhuma tabela encontrada.</Text>
+							<Text color={SECONDARY_TEXT}>Nenhuma tabela encontrada.</Text>
 						) : (
 							visibleTables.map((table, index) => {
 								const absoluteIndex = tablesWindowStart + index;
 								const isSelected = absoluteIndex === tablesIndex;
 								return (
-									<Text key={table.qualifiedName} color={isSelected ? 'magenta' : undefined}>
+									<Text key={table.qualifiedName} color={isSelected ? 'magenta' : PRIMARY_TEXT}>
 										{`${isSelected ? '›' : ' '} ${truncateText(table.qualifiedName, tableNameMaxLength)}`}
 									</Text>
 								);
 							})
 						)}
-						<Text dimColor>
+						<Text color={SECONDARY_TEXT}>
 							{tables.length > 0
 								? `${tablesIndex + 1}/${tables.length} • enter abre rows`
 								: 'esc fecha'}
@@ -971,7 +1003,12 @@ export default function App() {
 			) : null}
 
 			{mode === 'rowsModal' ? (
-				<Box width={terminalSize.columns} paddingX={1} paddingBottom={1} backgroundColor="#000">
+				<Box
+					width={terminalSize.columns}
+					paddingX={1}
+					paddingBottom={1}
+					backgroundColor={MAIN_BACKGROUND}
+				>
 					<Box
 						flexDirection="column"
 						borderStyle="round"
@@ -981,24 +1018,24 @@ export default function App() {
 						height={ROWS_MODAL_HEIGHT}
 					>
 						<Box justifyContent="space-between">
-							<Text bold>
+							<Text bold color={PRIMARY_TEXT}>
 								{selectedTable
 									? `Rows • ${truncateText(selectedTable.qualifiedName, Math.max(10, terminalSize.columns - 24))}`
 									: 'Rows'}
 							</Text>
-							<Text dimColor>esc</Text>
+							<Text color={SECONDARY_TEXT}>esc</Text>
 						</Box>
 						{isLoadingRows ? (
-							<Text dimColor>Carregando rows...</Text>
+							<Text color={SECONDARY_TEXT}>Carregando rows...</Text>
 						) : !rowsPreview ? (
-							<Text dimColor>Nenhuma row carregada.</Text>
+							<Text color={SECONDARY_TEXT}>Nenhuma row carregada.</Text>
 						) : rowsViewport.visibleColumns.length === 0 ? (
-							<Text dimColor>Não há colunas para exibir.</Text>
+							<Text color={SECONDARY_TEXT}>Não há colunas para exibir.</Text>
 						) : (
 							<>
 								<Text color="cyan">{rowsHeaderLine}</Text>
 								{rowsPreview.rows.length === 0 ? (
-									<Text dimColor>Sem rows para exibir.</Text>
+									<Text color={SECONDARY_TEXT}>Sem rows para exibir.</Text>
 								) : (
 									visibleRows.map((row, index) => {
 										const absoluteIndex = rowsWindowStart + index;
@@ -1010,21 +1047,24 @@ export default function App() {
 										const rowLine = `${rowLabel}${CELL_SEPARATOR}${rowCells}`;
 
 										return (
-											<Text key={`${absoluteIndex}-${rowLine}`} color={isSelected ? 'yellow' : undefined}>
+											<Text
+												key={`${absoluteIndex}-${rowLine}`}
+												color={isSelected ? 'yellow' : PRIMARY_TEXT}
+											>
 												{rowLine}
 											</Text>
 										);
 									})
 								)}
-								<Text dimColor>
+								<Text color={SECONDARY_TEXT}>
 									{`mostrando ${visibleRows.length}/${rowsPreview.rows.length} rows (limit ${rowsPreview.limit})`}
 								</Text>
-								<Text dimColor>
+								<Text color={SECONDARY_TEXT}>
 									{`colunas ${rowsViewport.offset + 1}-${rowsViewport.offset + rowsViewport.visibleColumns.length}/${rowsPreview.columns.length}`}
 								</Text>
 							</>
 						)}
-						<Text dimColor>↑/↓ rows • ←/→ colunas • esc volta</Text>
+						<Text color={SECONDARY_TEXT}>↑/↓ rows • ←/→ colunas • esc volta</Text>
 					</Box>
 				</Box>
 			) : null}
@@ -1033,12 +1073,12 @@ export default function App() {
 				width={terminalSize.columns}
 				height={INPUT_BAR_HEIGHT}
 				padding={1}
-				backgroundColor="#161616"
+				backgroundColor={SURFACE_BACKGROUND}
 				flexDirection="column"
 				justifyContent="space-between"
 			>
-				<Text>{inputLabel}</Text>
-				<Text>
+				<Text color={PRIMARY_TEXT}>{inputLabel}</Text>
+				<Text color={PRIMARY_TEXT}>
 					<Text color="green">Database </Text>
 					{dbIndicator}
 				</Text>
