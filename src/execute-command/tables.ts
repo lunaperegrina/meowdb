@@ -8,7 +8,7 @@ export async function handleTables(
 	configPath: string,
 	dependencies: Dependencies,
 ): Promise<CommandSuccess> {
-	assertMaximumArgumentCount(args, 1, 'meow tables [schema]');
+	assertMaximumArgumentCount(args, 1, 'meowdb tables [schema]');
 	const schema = args[0] ?? 'public';
 	assertIdentifier(schema, '--schema');
 	const config = await dependencies.readConfig(configPath);

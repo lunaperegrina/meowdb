@@ -7,7 +7,7 @@ export async function handleDbInfo(
 	configPath: string,
 	dependencies: Dependencies,
 ): Promise<CommandSuccess> {
-	assertArgumentCount(args, 0, 'meow db info');
+	assertArgumentCount(args, 0, 'meowdb db info');
 	const config = await dependencies.readConfig(configPath);
 	const connection = getActiveConnection(config);
 

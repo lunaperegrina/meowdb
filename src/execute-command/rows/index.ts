@@ -15,7 +15,7 @@ export async function handleRows(
 	assertArgumentCount(
 		args,
 		1,
-		'meow rows <table> [--schema <schema>] [--limit <n>]',
+		'meowdb rows <table> [--schema <schema>] [--limit <n>]',
 	);
 	const table = getRequiredArg(args, 0);
 	const schema = flags.schema ?? 'public';

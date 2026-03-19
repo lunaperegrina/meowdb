@@ -5,6 +5,11 @@ import { render } from 'ink';
 import meow from 'meow';
 import App from '@/app';
 import { executeCommand } from '@/execute-command/index';
+import {
+	createInteractiveController,
+	runInteractiveCli,
+	runPromptFallback,
+} from '@/interactive';
 import { toCliError } from '@/errors';
 import {
 	formatErrorJsonPayload,
@@ -16,7 +21,7 @@ import {
 const cli = meow(
 	`
 	Usage
-	  $ meow <command>
+	  $ meowdb <command>
 
 	Commands
 	  db add <name> <url>
@@ -32,10 +37,10 @@ const cli = meow(
 	  -q       Quiet mode
 
 	Examples
-	  $ meow db add local postgresql://user:pass@localhost:5432/app
-	  $ meow db use local
-	  $ meow tables
-	  $ meow rows users --limit 20
+	  $ meowdb db add local postgresql://user:pass@localhost:5432/app
+	  $ meowdb db use local
+	  $ meowdb tables
+	  $ meowdb rows users --limit 20
 `,
 	{
 		importMeta: import.meta,
@@ -59,22 +64,42 @@ const cli = meow(
 	},
 );
 
-try {
-	const result = await executeCommand(cli.input, {
-		json: cli.flags.json,
-		quiet: cli.flags.quiet,
-		schema: cli.flags.schema,
-		limit: cli.flags.limit,
-	});
+const flags = {
+	json: cli.flags.json,
+	quiet: cli.flags.quiet,
+	schema: cli.flags.schema,
+	limit: cli.flags.limit,
+};
 
-	if (cli.flags.json) {
-		process.stdout.write(`${formatSuccessJsonPayload(result)}\n`);
+try {
+	if (cli.input.length === 0) {
+		const controller = createInteractiveController({
+			environment: process.env,
+			flags,
+		});
+
+		if (cli.flags.json || cli.flags.quiet) {
+			await runPromptFallback({
+				controller,
+				quiet: cli.flags.quiet,
+			});
+		} else {
+			await runInteractiveCli({
+				controller,
+			});
+		}
 	} else {
-		render(
-			React.createElement(App, {
-				lines: formatHumanSuccessLines(result, cli.flags.quiet),
-			}),
-		);
+		const result = await executeCommand(cli.input, flags);
+
+		if (cli.flags.json) {
+			process.stdout.write(`${formatSuccessJsonPayload(result)}\n`);
+		} else {
+			render(
+				React.createElement(App, {
+					lines: formatHumanSuccessLines(result, cli.flags.quiet),
+				}),
+			);
+		}
 	}
 } catch (error: unknown) {
 	const cliError = toCliError(error);

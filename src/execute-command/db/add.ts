@@ -8,7 +8,7 @@ export async function handleDbAdd(
 	configPath: string,
 	dependencies: Dependencies,
 ): Promise<CommandSuccess> {
-	assertArgumentCount(args, 2, 'meow db add <name> <url>');
+	assertArgumentCount(args, 2, 'meowdb db add <name> <url>');
 	const name = getRequiredArg(args, 0);
 	const url = getRequiredArg(args, 1);
 	const normalizedUrl = normalizeDatabaseUrl(url);
@@ -16,7 +16,7 @@ export async function handleDbAdd(
 
 	if (name in config.connections) {
 		throw new CliError('INVALID_ARGUMENT', `db "${name}" already exists.`, {
-			hint: 'Run `meow db list` to inspect available names.',
+			hint: 'Run `meowdb db list` to inspect available names.',
 		});
 	}
 

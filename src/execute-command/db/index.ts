@@ -15,7 +15,7 @@ export async function handleDb(
 
 	if (!subcommand) {
 		throw new CliError('INVALID_ARGUMENT', 'Missing `db` subcommand.', {
-			hint: 'Run `meow db --help` for usage.',
+			hint: 'Run `meowdb db --help` for usage.',
 		});
 	}
 
@@ -45,7 +45,7 @@ export async function handleDb(
 				'INVALID_ARGUMENT',
 				`Unknown db subcommand "${subcommand}".`,
 				{
-					hint: 'Run `meow db --help` for usage.',
+					hint: 'Run `meowdb db --help` for usage.',
 				},
 			);
 		}

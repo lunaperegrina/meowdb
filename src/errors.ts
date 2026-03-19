@@ -33,7 +33,7 @@ export function toCliError(error: unknown): CliError {
 	}
 
 	return new CliError('INVALID_ARGUMENT', 'Unexpected error.', {
-		hint: 'Run `meow --help` for usage information.',
+		hint: 'Run `meowdb --help` for usage information.',
 		cause: error,
 	});
 }

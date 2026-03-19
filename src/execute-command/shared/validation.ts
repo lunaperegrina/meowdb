@@ -20,7 +20,7 @@ export function assertPositiveLimit(value: number): void {
 			'INVALID_ARGUMENT',
 			'Limit must be a positive integer.',
 			{
-				hint: 'Run `meow rows <table> --limit 20`.',
+				hint: 'Run `meowdb rows <table> --limit 20`.',
 			},
 		);
 	}

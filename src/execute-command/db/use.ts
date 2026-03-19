@@ -7,13 +7,13 @@ export async function handleDbUse(
 	configPath: string,
 	dependencies: Dependencies,
 ): Promise<CommandSuccess> {
-	assertArgumentCount(args, 1, 'meow db use <name>');
+	assertArgumentCount(args, 1, 'meowdb db use <name>');
 	const name = getRequiredArg(args, 0);
 	const config = await dependencies.readConfig(configPath);
 
 	if (!(name in config.connections)) {
 		throw new CliError('DB_NOT_FOUND', `db "${name}" not found.`, {
-			hint: 'Run `meow db list` to see available names.',
+			hint: 'Run `meowdb db list` to see available names.',
 		});
 	}
 

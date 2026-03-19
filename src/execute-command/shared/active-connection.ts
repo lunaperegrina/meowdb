@@ -7,14 +7,14 @@ export function getActiveConnection(config: CliConfig): {
 } {
 	if (!config.activeDb) {
 		throw new CliError('DB_NOT_SELECTED', 'No active db selected.', {
-			hint: 'Run `meow db use <name>` to select one.',
+			hint: 'Run `meowdb db use <name>` to select one.',
 		});
 	}
 
 	const connection = config.connections[config.activeDb];
 	if (!connection) {
 		throw new CliError('DB_NOT_FOUND', `db "${config.activeDb}" not found.`, {
-			hint: 'Run `meow db list` to see available names.',
+			hint: 'Run `meowdb db list` to see available names.',
 		});
 	}
 

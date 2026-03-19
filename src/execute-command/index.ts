@@ -37,7 +37,7 @@ export async function executeCommand(
 
 	if (!command) {
 		throw new CliError('INVALID_ARGUMENT', 'No command provided.', {
-			hint: 'Run `meow --help` to see available commands.',
+			hint: 'Run `meowdb --help` to see available commands.',
 		});
 	}
 
@@ -56,7 +56,7 @@ export async function executeCommand(
 
 		default: {
 			throw new CliError('INVALID_ARGUMENT', `Unknown command "${command}".`, {
-				hint: 'Run `meow --help` to see available commands.',
+				hint: 'Run `meowdb --help` to see available commands.',
 			});
 		}
 	}

@@ -8,7 +8,7 @@ export async function handleDbList(
 	configPath: string,
 	dependencies: Dependencies,
 ): Promise<CommandSuccess> {
-	assertArgumentCount(args, 0, 'meow db list');
+	assertArgumentCount(args, 0, 'meowdb db list');
 
 	let config = defaultConfig;
 	try {
@@ -26,7 +26,7 @@ export async function handleDbList(
 		const connection = config.connections[name];
 		if (!connection) {
 			throw new CliError('INVALID_ARGUMENT', 'Configuration file is invalid.', {
-				hint: 'Run `meow db list` again after fixing configuration.',
+				hint: 'Run `meowdb db list` again after fixing configuration.',
 			});
 		}
 

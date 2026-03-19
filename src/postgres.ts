@@ -27,7 +27,7 @@ export async function listTables(
 				'DB_CONNECTION_FAILED',
 				'Could not connect to PostgreSQL.',
 				{
-					hint: 'Check the active database URL with `meow db info`.',
+					hint: 'Check the active database URL with `meowdb db info`.',
 					cause: error,
 				},
 			);
@@ -63,7 +63,7 @@ export async function getRows(
 				'DB_CONNECTION_FAILED',
 				'Could not connect to PostgreSQL.',
 				{
-					hint: 'Check the active database URL with `meow db info`.',
+					hint: 'Check the active database URL with `meowdb db info`.',
 					cause: error,
 				},
 			);

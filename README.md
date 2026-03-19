@@ -4,17 +4,17 @@ Minimal PostgreSQL CLI for listing tables and inspecting rows.
 
 ## 1) Quick Overview
 
-Official root command: `meow`
+Official root command: `meowdb`
 
 Current v1 surface:
 
-- `meow db add <name> <url>`
-- `meow db list`
-- `meow db use <name>`
-- `meow db info`
-- `meow db remove <name>`
-- `meow tables [schema]`
-- `meow rows <table> [--schema <schema>] [--limit <n>]`
+- `meowdb db add <name> <url>`
+- `meowdb db list`
+- `meowdb db use <name>`
+- `meowdb db info`
+- `meowdb db remove <name>`
+- `meowdb tables [schema]`
+- `meowdb rows <table> [--schema <schema>] [--limit <n>]`
 
 Out of v1 scope for now: `schemas`
 
@@ -28,22 +28,22 @@ npm install --global meow-db
 
 ```bash
 # 1) Add db
-meow db add local postgresql://user:pass@localhost:5432/app
+meowdb db add local postgresql://user:pass@localhost:5432/app
 
 # 2) Select active db
-meow db use local
+meowdb db use local
 
 # 3) List tables
-meow tables
+meowdb tables
 
 # 4) Inspect rows from a table
-meow rows users --limit 20
+meowdb rows users --limit 20
 ```
 
 ## 4) Command Structure
 
 ```text
-meow
+meowdb
   db
     add <name> <url>
     list
@@ -64,9 +64,9 @@ meow
 Recommended contextual help:
 
 ```bash
-meow --help
-meow db --help
-meow rows --help
+meowdb --help
+meowdb db --help
+meowdb rows --help
 ```
 
 ## 5) Per-command Examples
@@ -74,27 +74,27 @@ meow rows --help
 ### Connection
 
 ```bash
-meow db add prod postgresql://user:pass@db.example.com:5432/app
-meow db list
-meow db use prod
-meow db info
-meow db remove prod
+meowdb db add prod postgresql://user:pass@db.example.com:5432/app
+meowdb db list
+meowdb db use prod
+meowdb db info
+meowdb db remove prod
 ```
 
 ### Tables
 
 ```bash
-meow tables
-meow tables analytics
+meowdb tables
+meowdb tables analytics
 ```
 
 ### Rows
 
 ```bash
-meow rows users
-meow rows users --schema analytics
-meow rows users --limit 100
-meow rows users --json
+meowdb rows users
+meowdb rows users --schema analytics
+meowdb rows users --limit 100
+meowdb rows users --json
 ```
 
 ## 6) Output and Error Conventions
@@ -115,7 +115,7 @@ Actionable error example:
 
 ```text
 Error: db "prod" not found.
-Hint: run `meow db list` to see available names.
+Hint: run `meowdb db list` to see available names.
 ```
 
 ## Reference

@@ -36,7 +36,7 @@ export function getRequiredArg(args: string[], index: number): string {
 	const argument = args[index];
 	if (!argument) {
 		throw new CliError('INVALID_ARGUMENT', 'Required argument is missing.', {
-			hint: 'Run `meow --help` to see command usage.',
+			hint: 'Run `meowdb --help` to see command usage.',
 		});
 	}
 
