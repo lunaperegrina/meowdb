@@ -17,7 +17,6 @@ const FALLBACK_ROWS = 24;
 const STATUS_BAR_HEIGHT = 1;
 const INPUT_BAR_HEIGHT = 5;
 const MODAL_HEIGHT = 9;
-const ROWS_MODAL_HEIGHT = 14;
 const ROWS_PREVIEW_LIMIT = 50;
 const ROW_NUMBER_WIDTH = 4;
 const CELL_MIN_WIDTH = 8;
@@ -726,16 +725,14 @@ export default function App() {
 	});
 
 	const modalRows =
-		mode === 'chat'
-			? 0
-			: mode === 'rowsModal'
-				? ROWS_MODAL_HEIGHT
-				: MODAL_HEIGHT;
-	const messageViewportRows = Math.max(
+		mode === 'slashMenu' || mode === 'addForm' || mode === 'listModal'
+			? MODAL_HEIGHT
+			: 0;
+	const mainViewportRows = Math.max(
 		1,
 		terminalSize.rows - INPUT_BAR_HEIGHT - STATUS_BAR_HEIGHT - modalRows - 2,
 	);
-	const visibleMessages = messages.slice(-messageViewportRows);
+	const visibleMessages = messages.slice(-mainViewportRows);
 	const inputLabel =
 		mode === 'chat'
 			? `› ${draft}`
@@ -797,7 +794,7 @@ export default function App() {
 		return `${padCell('row', ROW_NUMBER_WIDTH)}${CELL_SEPARATOR}${headerColumns}`;
 	}, [rowsViewport]);
 
-	const rowsWindowSize = Math.max(1, ROWS_MODAL_HEIGHT - 6);
+	const rowsWindowSize = Math.max(1, mainViewportRows - 5);
 	const maxRowsWindowStart = Math.max(0, rowsCount - rowsWindowSize);
 	const rowsWindowStart = Math.min(
 		maxRowsWindowStart,
@@ -807,7 +804,7 @@ export default function App() {
 		? rowsPreview.rows.slice(rowsWindowStart, rowsWindowStart + rowsWindowSize)
 		: [];
 
-	const tablesWindowSize = Math.max(1, MODAL_HEIGHT - 3);
+	const tablesWindowSize = Math.max(1, mainViewportRows - 2);
 	const maxTablesWindowStart = Math.max(0, tables.length - tablesWindowSize);
 	const tablesWindowStart = Math.min(
 		maxTablesWindowStart,
@@ -832,14 +829,98 @@ export default function App() {
 				overflow="hidden"
 				backgroundColor={MAIN_BACKGROUND}
 			>
-				{visibleMessages.length === 0 ? (
-					<Text color={SECONDARY_TEXT}>Digite / para abrir o slash menu.</Text>
-				) : null}
-				{visibleMessages.map((message, index) => (
-					<Text key={`${index}-${message}`} color={PRIMARY_TEXT}>
-						{message}
-					</Text>
-				))}
+				{mode === 'tablesModal' ? (
+					<>
+						<Box justifyContent="space-between">
+							<Text bold color={PRIMARY_TEXT}>
+								Tables
+							</Text>
+							<Text color={SECONDARY_TEXT}>esc</Text>
+						</Box>
+						{isLoadingTables ? (
+							<Text color={SECONDARY_TEXT}>Carregando tabelas...</Text>
+						) : tables.length === 0 ? (
+							<Text color={SECONDARY_TEXT}>Nenhuma tabela encontrada.</Text>
+						) : (
+							visibleTables.map((table, index) => {
+								const absoluteIndex = tablesWindowStart + index;
+								const isSelected = absoluteIndex === tablesIndex;
+								return (
+									<Text key={table.qualifiedName} color={isSelected ? 'magenta' : PRIMARY_TEXT}>
+										{`${isSelected ? '›' : ' '} ${truncateText(table.qualifiedName, tableNameMaxLength)}`}
+									</Text>
+								);
+							})
+						)}
+						<Text color={SECONDARY_TEXT}>
+							{tables.length > 0
+								? `${tablesIndex + 1}/${tables.length} • enter abre rows`
+								: 'esc fecha'}
+						</Text>
+					</>
+				) : mode === 'rowsModal' ? (
+					<>
+						<Box justifyContent="space-between">
+							<Text bold color={PRIMARY_TEXT}>
+								{selectedTable
+									? `Rows • ${truncateText(selectedTable.qualifiedName, Math.max(10, terminalSize.columns - 24))}`
+									: 'Rows'}
+							</Text>
+							<Text color={SECONDARY_TEXT}>esc</Text>
+						</Box>
+						{isLoadingRows ? (
+							<Text color={SECONDARY_TEXT}>Carregando rows...</Text>
+						) : !rowsPreview ? (
+							<Text color={SECONDARY_TEXT}>Nenhuma row carregada.</Text>
+						) : rowsViewport.visibleColumns.length === 0 ? (
+							<Text color={SECONDARY_TEXT}>Não há colunas para exibir.</Text>
+						) : (
+							<>
+								<Text color="cyan">{rowsHeaderLine}</Text>
+								{rowsPreview.rows.length === 0 ? (
+									<Text color={SECONDARY_TEXT}>Sem rows para exibir.</Text>
+								) : (
+									visibleRows.map((row, index) => {
+										const absoluteIndex = rowsWindowStart + index;
+										const isSelected = absoluteIndex === rowsIndex;
+										const rowLabel = padCell(String(absoluteIndex + 1), ROW_NUMBER_WIDTH);
+										const rowCells = rowsViewport.visibleColumns
+											.map(column => padCell(formatCellValue(row[column]), rowsViewport.cellWidth))
+											.join(CELL_SEPARATOR);
+										const rowLine = `${rowLabel}${CELL_SEPARATOR}${rowCells}`;
+
+										return (
+											<Text
+												key={`${absoluteIndex}-${rowLine}`}
+												color={isSelected ? 'yellow' : PRIMARY_TEXT}
+											>
+												{rowLine}
+											</Text>
+										);
+									})
+								)}
+								<Text color={SECONDARY_TEXT}>
+									{`mostrando ${visibleRows.length}/${rowsPreview.rows.length} rows (limit ${rowsPreview.limit})`}
+								</Text>
+								<Text color={SECONDARY_TEXT}>
+									{`colunas ${rowsViewport.offset + 1}-${rowsViewport.offset + rowsViewport.visibleColumns.length}/${rowsPreview.columns.length}`}
+								</Text>
+							</>
+						)}
+						<Text color={SECONDARY_TEXT}>↑/↓ rows • ←/→ colunas • esc volta</Text>
+					</>
+				) : (
+					<>
+						{visibleMessages.length === 0 ? (
+							<Text color={SECONDARY_TEXT}>Digite / para abrir o slash menu.</Text>
+						) : null}
+						{visibleMessages.map((message, index) => (
+							<Text key={`${index}-${message}`} color={PRIMARY_TEXT}>
+								{message}
+							</Text>
+						))}
+					</>
+				)}
 			</Box>
 
 			{mode === 'slashMenu' ? (
@@ -953,118 +1034,6 @@ export default function App() {
 							})
 						)}
 						<Text color={SECONDARY_TEXT}>{isSettingActive && 'Ativando database...'}</Text>
-					</Box>
-				</Box>
-			) : null}
-
-			{mode === 'tablesModal' ? (
-				<Box
-					width={terminalSize.columns}
-					paddingX={1}
-					paddingBottom={1}
-					backgroundColor={MAIN_BACKGROUND}
-				>
-					<Box
-						flexDirection="column"
-						borderStyle="round"
-						borderColor="magenta"
-						paddingX={1}
-						width={Math.max(24, terminalSize.columns - 2)}
-						height={MODAL_HEIGHT}
-					>
-						<Box justifyContent="space-between">
-							<Text bold color={PRIMARY_TEXT}>
-								Tables
-							</Text>
-							<Text color={SECONDARY_TEXT}>esc</Text>
-						</Box>
-						{isLoadingTables ? (
-							<Text color={SECONDARY_TEXT}>Carregando tabelas...</Text>
-						) : tables.length === 0 ? (
-							<Text color={SECONDARY_TEXT}>Nenhuma tabela encontrada.</Text>
-						) : (
-							visibleTables.map((table, index) => {
-								const absoluteIndex = tablesWindowStart + index;
-								const isSelected = absoluteIndex === tablesIndex;
-								return (
-									<Text key={table.qualifiedName} color={isSelected ? 'magenta' : PRIMARY_TEXT}>
-										{`${isSelected ? '›' : ' '} ${truncateText(table.qualifiedName, tableNameMaxLength)}`}
-									</Text>
-								);
-							})
-						)}
-						<Text color={SECONDARY_TEXT}>
-							{tables.length > 0
-								? `${tablesIndex + 1}/${tables.length} • enter abre rows`
-								: 'esc fecha'}
-						</Text>
-					</Box>
-				</Box>
-			) : null}
-
-			{mode === 'rowsModal' ? (
-				<Box
-					width={terminalSize.columns}
-					paddingX={1}
-					paddingBottom={1}
-					backgroundColor={MAIN_BACKGROUND}
-				>
-					<Box
-						flexDirection="column"
-						borderStyle="round"
-						borderColor="cyan"
-						paddingX={1}
-						width={Math.max(24, terminalSize.columns - 2)}
-						height={ROWS_MODAL_HEIGHT}
-					>
-						<Box justifyContent="space-between">
-							<Text bold color={PRIMARY_TEXT}>
-								{selectedTable
-									? `Rows • ${truncateText(selectedTable.qualifiedName, Math.max(10, terminalSize.columns - 24))}`
-									: 'Rows'}
-							</Text>
-							<Text color={SECONDARY_TEXT}>esc</Text>
-						</Box>
-						{isLoadingRows ? (
-							<Text color={SECONDARY_TEXT}>Carregando rows...</Text>
-						) : !rowsPreview ? (
-							<Text color={SECONDARY_TEXT}>Nenhuma row carregada.</Text>
-						) : rowsViewport.visibleColumns.length === 0 ? (
-							<Text color={SECONDARY_TEXT}>Não há colunas para exibir.</Text>
-						) : (
-							<>
-								<Text color="cyan">{rowsHeaderLine}</Text>
-								{rowsPreview.rows.length === 0 ? (
-									<Text color={SECONDARY_TEXT}>Sem rows para exibir.</Text>
-								) : (
-									visibleRows.map((row, index) => {
-										const absoluteIndex = rowsWindowStart + index;
-										const isSelected = absoluteIndex === rowsIndex;
-										const rowLabel = padCell(String(absoluteIndex + 1), ROW_NUMBER_WIDTH);
-										const rowCells = rowsViewport.visibleColumns
-											.map(column => padCell(formatCellValue(row[column]), rowsViewport.cellWidth))
-											.join(CELL_SEPARATOR);
-										const rowLine = `${rowLabel}${CELL_SEPARATOR}${rowCells}`;
-
-										return (
-											<Text
-												key={`${absoluteIndex}-${rowLine}`}
-												color={isSelected ? 'yellow' : PRIMARY_TEXT}
-											>
-												{rowLine}
-											</Text>
-										);
-									})
-								)}
-								<Text color={SECONDARY_TEXT}>
-									{`mostrando ${visibleRows.length}/${rowsPreview.rows.length} rows (limit ${rowsPreview.limit})`}
-								</Text>
-								<Text color={SECONDARY_TEXT}>
-									{`colunas ${rowsViewport.offset + 1}-${rowsViewport.offset + rowsViewport.visibleColumns.length}/${rowsPreview.columns.length}`}
-								</Text>
-							</>
-						)}
-						<Text color={SECONDARY_TEXT}>↑/↓ rows • ←/→ colunas • esc volta</Text>
 					</Box>
 				</Box>
 			) : null}
