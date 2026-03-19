@@ -119,8 +119,9 @@ const isNavigationKey = (key: {
 const normalizeInput = (value: string) => value.replaceAll(/\r?\n/g, '');
 const ESCAPE_INPUT = '\u001B';
 const ENABLE_MOUSE_TRACKING = '\u001B[?1000h\u001B[?1006h';
-const DISABLE_MOUSE_TRACKING = '\u001B[?1000l\u001B[?1006l';
-const SGR_MOUSE_EVENT_PATTERN = /^\[<(\d+);(\d+);(\d+)([Mm])$/;
+const DISABLE_MOUSE_TRACKING =
+	'\u001B[?1000l\u001B[?1002l\u001B[?1003l\u001B[?1005l\u001B[?1006l\u001B[?1015l';
+const SGR_MOUSE_PACKET_PATTERN = /(?:\u001B)?\[<(\d+);(\d+);(\d+)([Mm])/g;
 
 const wrapIndex = (index: number, total: number): number => {
 	if (total <= 0) {
@@ -149,16 +150,20 @@ type ParsedMouseEvent = {
 	y: number;
 };
 
-const parseSgrMouseEvent = (input: string): ParsedMouseEvent | null => {
-	const match = SGR_MOUSE_EVENT_PATTERN.exec(input);
-	if (!match) {
-		return null;
-	}
+type ParsedMouseInput = {
+	consumed: boolean;
+	events: ParsedMouseEvent[];
+};
 
-	const buttonCode = Number.parseInt(match[1], 10);
-	const x = Number.parseInt(match[2], 10);
-	const y = Number.parseInt(match[3], 10);
-	const marker = match[4];
+const parseSgrMousePacket = (
+	buttonCodeRaw: string,
+	xRaw: string,
+	yRaw: string,
+	marker: string,
+): ParsedMouseEvent | null => {
+	const buttonCode = Number.parseInt(buttonCodeRaw, 10);
+	const x = Number.parseInt(xRaw, 10);
+	const y = Number.parseInt(yRaw, 10);
 
 	if (
 		Number.isNaN(buttonCode) ||
@@ -191,6 +196,45 @@ const parseSgrMouseEvent = (input: string): ParsedMouseEvent | null => {
 	}
 
 	return null;
+};
+
+const parseSgrMouseInput = (input: string): ParsedMouseInput => {
+	const events: ParsedMouseEvent[] = [];
+	let hasPacket = false;
+	let consumedLength = 0;
+
+	SGR_MOUSE_PACKET_PATTERN.lastIndex = 0;
+	let match = SGR_MOUSE_PACKET_PATTERN.exec(input);
+	while (match) {
+		if (match.index !== consumedLength) {
+			return {
+				consumed: false,
+				events: [],
+			};
+		}
+
+		hasPacket = true;
+		consumedLength += match[0].length;
+
+		const parsedEvent = parseSgrMousePacket(match[1], match[2], match[3], match[4]);
+		if (parsedEvent) {
+			events.push(parsedEvent);
+		}
+
+		match = SGR_MOUSE_PACKET_PATTERN.exec(input);
+	}
+
+	if (!hasPacket || consumedLength !== input.length) {
+		return {
+			consumed: false,
+			events: [],
+		};
+	}
+
+	return {
+		consumed: true,
+		events,
+	};
 };
 
 const truncateText = (value: string, maxLength: number): string => {
@@ -357,9 +401,18 @@ export default function App() {
 			return;
 		}
 
-		stdout.write(ENABLE_MOUSE_TRACKING);
-		return () => {
+		const disableMouseTracking = () => {
 			stdout.write(DISABLE_MOUSE_TRACKING);
+		};
+
+		stdout.write(ENABLE_MOUSE_TRACKING);
+		process.on('beforeExit', disableMouseTracking);
+		process.on('exit', disableMouseTracking);
+
+		return () => {
+			process.off('beforeExit', disableMouseTracking);
+			process.off('exit', disableMouseTracking);
+			disableMouseTracking();
 		};
 	}, [stdout]);
 
@@ -667,6 +720,80 @@ export default function App() {
 	};
 
 	useInput((input, key) => {
+		const parsedMouseInput = parseSgrMouseInput(input);
+		if (parsedMouseInput.consumed) {
+			if (mode !== 'chat' || !hasActiveDatabase) {
+				return;
+			}
+
+			const splitPaneX = 1;
+			const splitPaneY = 1;
+			const sidebarXStart = splitPaneX;
+			const sidebarXEnd = sidebarXStart + splitPaneSizes.sidebarWidth;
+			const tablesListYStart = splitPaneY + 1;
+			const tablesListYEnd = tablesListYStart + visibleTables.length;
+			const contentXStart = sidebarXEnd + SPLIT_GAP;
+			const contentXEnd = contentXStart + splitPaneSizes.contentWidth;
+			const contentYStart = splitPaneY + 1;
+			const contentYEnd = contentYStart + Math.max(0, mainViewportRows - 1);
+
+			for (const mouseEvent of parsedMouseInput.events) {
+				const isWithinSidebar =
+					mouseEvent.x >= sidebarXStart &&
+					mouseEvent.x < sidebarXEnd &&
+					mouseEvent.y >= splitPaneY &&
+					mouseEvent.y < splitPaneY + mainViewportRows;
+
+				if (isWithinSidebar) {
+					if (
+						(mouseEvent.type === 'wheelUp' || mouseEvent.type === 'wheelDown') &&
+						!isLoadingTables &&
+						tables.length > 0
+					) {
+						const delta = mouseEvent.type === 'wheelDown' ? 1 : -1;
+						setTablesIndex(previous => clamp(previous + delta, 0, tables.length - 1));
+					}
+
+					if (
+						mouseEvent.type === 'leftClick' &&
+						!isLoadingTables &&
+						mouseEvent.y >= tablesListYStart &&
+						mouseEvent.y < tablesListYEnd
+					) {
+						const relativeIndex = mouseEvent.y - tablesListYStart;
+						const absoluteIndex = tablesWindowStart + relativeIndex;
+						const table = tables[absoluteIndex];
+						if (table) {
+							setTablesIndex(absoluteIndex);
+							void loadRowsForTable(table);
+						}
+					}
+
+					continue;
+				}
+
+				const isWithinContent =
+					mouseEvent.x >= contentXStart &&
+					mouseEvent.x < contentXEnd &&
+					mouseEvent.y >= contentYStart &&
+					mouseEvent.y < contentYEnd;
+
+				if (
+					isWithinContent &&
+					(mouseEvent.type === 'wheelUp' || mouseEvent.type === 'wheelDown') &&
+					rowsPreview &&
+					!isLoadingRows
+				) {
+					const delta = mouseEvent.type === 'wheelDown' ? 1 : -1;
+					setRowsWindowStart(previous =>
+						clamp(previous + delta, 0, maxRowsWindowStart),
+					);
+				}
+			}
+
+			return;
+		}
+
 		const isEscapePressed = key.escape || input === ESCAPE_INPUT;
 
 		if (isEscapePressed) {
@@ -685,78 +812,6 @@ export default function App() {
 				setMode('chat');
 				return;
 			}
-		}
-
-		const mouseEvent = parseSgrMouseEvent(input);
-		if (mouseEvent) {
-			if (mode !== 'chat' || !hasActiveDatabase) {
-				return;
-			}
-
-			const splitPaneX = 1;
-			const splitPaneY = 1;
-			const sidebarXStart = splitPaneX;
-			const sidebarXEnd = sidebarXStart + splitPaneSizes.sidebarWidth;
-			const tablesListYStart = splitPaneY + 1;
-			const tablesListYEnd = tablesListYStart + visibleTables.length;
-			const contentXStart = sidebarXEnd + SPLIT_GAP;
-			const contentXEnd = contentXStart + splitPaneSizes.contentWidth;
-			const contentYStart = splitPaneY + 1;
-			const contentYEnd = contentYStart + Math.max(0, mainViewportRows - 1);
-
-			const isWithinSidebar =
-				mouseEvent.x >= sidebarXStart &&
-				mouseEvent.x < sidebarXEnd &&
-				mouseEvent.y >= splitPaneY &&
-				mouseEvent.y < splitPaneY + mainViewportRows;
-
-			if (isWithinSidebar) {
-				if (
-					(mouseEvent.type === 'wheelUp' || mouseEvent.type === 'wheelDown') &&
-					!isLoadingTables &&
-					tables.length > 0
-				) {
-					const delta = mouseEvent.type === 'wheelDown' ? 1 : -1;
-					setTablesIndex(previous => clamp(previous + delta, 0, tables.length - 1));
-				}
-
-				if (
-					mouseEvent.type === 'leftClick' &&
-					!isLoadingTables &&
-					mouseEvent.y >= tablesListYStart &&
-					mouseEvent.y < tablesListYEnd
-				) {
-					const relativeIndex = mouseEvent.y - tablesListYStart;
-					const absoluteIndex = tablesWindowStart + relativeIndex;
-					const table = tables[absoluteIndex];
-					if (table) {
-						setTablesIndex(absoluteIndex);
-						void loadRowsForTable(table);
-					}
-				}
-
-				return;
-			}
-
-			const isWithinContent =
-				mouseEvent.x >= contentXStart &&
-				mouseEvent.x < contentXEnd &&
-				mouseEvent.y >= contentYStart &&
-				mouseEvent.y < contentYEnd;
-
-			if (
-				isWithinContent &&
-				(mouseEvent.type === 'wheelUp' || mouseEvent.type === 'wheelDown') &&
-				rowsPreview &&
-				!isLoadingRows
-			) {
-				const delta = mouseEvent.type === 'wheelDown' ? 1 : -1;
-				setRowsWindowStart(previous =>
-					clamp(previous + delta, 0, maxRowsWindowStart),
-				);
-			}
-
-			return;
 		}
 
 		if (key.ctrl || key.meta) {
