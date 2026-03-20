@@ -1,0 +1,23 @@
+export const FALLBACK_COLUMNS = 80;
+export const FALLBACK_ROWS = 24;
+export const STATUS_BAR_HEIGHT = 1;
+export const INPUT_BAR_HEIGHT = 5;
+export const MODAL_HEIGHT = 9;
+export const SPLIT_GAP = 2;
+export const SIDEBAR_MIN_WIDTH = 24;
+export const SIDEBAR_MAX_WIDTH = 44;
+export const CONTENT_MIN_WIDTH = 20;
+export const ROWS_PREVIEW_LIMIT = 50;
+export const ROW_NUMBER_WIDTH = 4;
+export const CELL_MIN_WIDTH = 8;
+export const CELL_MAX_WIDTH = 24;
+export const CELL_SEPARATOR = ' | ';
+export const MAIN_BACKGROUND = '#0B1020';
+export const SURFACE_BACKGROUND = '#131A2A';
+export const PRIMARY_TEXT = '#F3F6FC';
+export const SECONDARY_TEXT = '#8C97B2';
+export const ESCAPE_INPUT = '\u001B';
+export const ENABLE_MOUSE_TRACKING = '\u001B[?1000h\u001B[?1006h';
+export const DISABLE_MOUSE_TRACKING =
+	'\u001B[?1000l\u001B[?1002l\u001B[?1003l\u001B[?1005l\u001B[?1006l\u001B[?1015l';
+export const SGR_MOUSE_PACKET_PATTERN = /(?:\u001B)?\[<(\d+);(\d+);(\d+)([Mm])/g;
