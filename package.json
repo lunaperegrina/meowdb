@@ -1,6 +1,6 @@
 {
 	"name": "@lunaperegrina/meowdb",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"license": "MIT",
 	"bin": {
 		"meowdb": "dist/bundle.js"
@@ -12,7 +12,8 @@
 	"scripts": {
 		"build": "rm -rf dist && tsc --noEmit && esbuild src/index.tsx --bundle --minify --platform=node --format=esm --packages=external --outfile=dist/bundle.js",
 		"local": "npm run build && npm link",
-		"dev": "bun --hot src/index.tsx"
+		"dev": "bun --hot src/index.tsx",
+		"publish": "npm run build && npm publish --access public"
 	},
 	"files": [
 		"dist"
