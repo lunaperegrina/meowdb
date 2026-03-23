@@ -8,6 +8,10 @@
 
 A tiny, cute terminal app to explore PostgreSQL databases quickly. (´｡• ᵕ •｡`)
 
+## GitHub
+
+https://github.com/lunaperegrina/meowdb
+
 ## Features
 
 - Save multiple PostgreSQL connections and keep one active.
